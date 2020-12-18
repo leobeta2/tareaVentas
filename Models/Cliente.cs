@@ -17,8 +17,6 @@ namespace TestConsoleTrabajo.Models
         public string antiguedad { get; set; }
 
         public string categoriaCliente { get; set; }
-
-        public Ventas ventas { get; set; }
     }
 }
 
