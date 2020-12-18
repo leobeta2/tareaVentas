@@ -11,7 +11,7 @@ namespace TestConsoleTrabajo
         static void Main(string[] args)
         {
             Cliente cliente = new Cliente();
-            //var datosPersonales = DatosPersonalesCliente(cliente);
+            var datosPersonales = DatosPersonalesCliente(cliente);
 
             DatosVentasCliente();
             Console.WriteLine("fdsfsd");
@@ -33,7 +33,9 @@ namespace TestConsoleTrabajo
             {
                 Console.WriteLine("telefonos de contacto, para terminar ingrese 0:");
                 telefono = Console.ReadLine();
-                tel.Add(telefono);
+                if (telefono != "0") {
+                    tel.Add(telefono);
+                }
             } while (telefono != "0");
             cliente.telefono = tel;
             Console.WriteLine("Fecha ingreso como cliente (dd/mm/aaaa):");
@@ -42,6 +44,36 @@ namespace TestConsoleTrabajo
             cliente.antiguedad = Console.ReadLine();
             Console.WriteLine("Categoria Cliente: Brass, Silver, Gold:");
             cliente.categoriaCliente = Console.ReadLine();
+            string docPath =
+              Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "DatosCliente.txt")))
+            {
+                outputFile.WriteLine(cliente.nombres);
+                outputFile.WriteLine(cliente.apellidos);
+                outputFile.WriteLine(cliente.direccion);
+                foreach (var item in cliente.telefono)
+                {
+                    outputFile.WriteLine(item);
+                }
+                
+                outputFile.WriteLine(cliente.fechaIngreso);
+                outputFile.WriteLine(cliente.antiguedad);
+                outputFile.WriteLine(cliente.categoriaCliente);
+            }
+
+            using (StreamReader file = new StreamReader(Path.Combine(docPath, "DatosCliente.txt")))
+            {
+                string ln;
+                while ((ln = file.ReadLine()) != null)
+                {
+                    Console.WriteLine(ln);
+                   
+                }
+
+                file.Close();
+
+            }
+
             return cliente;
         }
 
@@ -79,8 +111,8 @@ namespace TestConsoleTrabajo
                 int TotalVentasAno = 0;
                 int mesMayorVenta = 0;
                 int mesMenorVenta = 0;
-                int MayorVenta=0;
-                int MenorVenta=0;
+                int MayorVenta = 0;
+                int MenorVenta = 0;
                 bool band = true;
                 while ((ln = file.ReadLine()) != null)
                 {
