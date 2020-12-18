@@ -11,10 +11,9 @@ namespace TestConsoleTrabajo
         static void Main(string[] args)
         {
             Cliente cliente = new Cliente();
-            var datosPersonales = DatosPersonalesCliente(cliente);
+            //var datosPersonales = DatosPersonalesCliente(cliente);
 
             DatosVentasCliente();
-            Console.WriteLine("fdsfsd");
 
         }
 
@@ -80,28 +79,36 @@ namespace TestConsoleTrabajo
         public static void DatosVentasCliente()
         {
             Ventas ventas = new Ventas();
-            Dictionary<int, int> mesVenta = new Dictionary<int, int>();
+            //Dictionary<int, int> mesVenta = new Dictionary<int, int>();
+            ArrayList mesVenta = new ArrayList();
             int ventasMes;
+            string docPath =
+                  Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
             Console.WriteLine("\nVENTAS CLIENTE\n");
             Console.WriteLine("Cuantos años desea ingresar:");
-            //int cantAnos = Convert.ToInt32(Console.ReadLine());
-            //for (int i = 0; i < cantAnos; i++) {
-            for (int j = 0; j < 12; j++)
-            {
-                Console.WriteLine($"Ingrese venta total del mes {j + 1}:");
-                ventasMes = Convert.ToInt32(Console.ReadLine());
-                mesVenta.Add(j, ventasMes);
-            }
-            //}
-
-            string docPath =
-              Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            int cantAnos = Convert.ToInt32(Console.ReadLine());
+            string ano;
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "VentasCliente.txt")))
             {
-
-                foreach (KeyValuePair<int, int> entry in mesVenta)
-                    outputFile.WriteLine(entry.Value);
+                for (int i = 0; i < cantAnos; i++)
+                {
+                Console.WriteLine("Ingrese año:");
+                ano = Console.ReadLine();
+                for (int j = 0; j < 12; j++)
+                {
+                    Console.WriteLine($"Ingrese venta total del mes {j + 1}:");
+                    ventasMes = Convert.ToInt32(Console.ReadLine());
+                    mesVenta.Add(ventasMes);
+                }
+                
+                
+                    outputFile.WriteLine(ano);
+                    foreach (var item  in mesVenta)
+                        outputFile.WriteLine(item);
+                
+                mesVenta.Clear();
+                }
             }
 
             using (StreamReader file = new StreamReader(Path.Combine(docPath, "VentasCliente.txt")))
@@ -114,8 +121,16 @@ namespace TestConsoleTrabajo
                 int MayorVenta = 0;
                 int MenorVenta = 0;
                 bool band = true;
+                bool band2 = true;
+                String a="";
                 while ((ln = file.ReadLine()) != null)
                 {
+                    if (band2) {
+                        a = ln;
+                        band2 = false;
+                        Console.WriteLine("Año: " + a);
+                        continue;
+                    }
                     Console.WriteLine(ln);
                     counter++;
                     TotalVentasAno = TotalVentasAno + Convert.ToInt32(ln);
@@ -134,11 +149,23 @@ namespace TestConsoleTrabajo
                     {
                         MenorVenta = Convert.ToInt32(ln);
                         mesMenorVenta = counter + 1;
-                    }  
+                    }
+                    if (counter >= 12) {
+                        Console.WriteLine($"\nTotal anual año {a}: " + TotalVentasAno);
+                        Console.WriteLine("Mes mayor venta: " + mesMayorVenta);
+                        Console.WriteLine("Mes menor venta: " + mesMenorVenta);
+                        counter = 0;
+                            TotalVentasAno = 0;
+                            mesMayorVenta = 0;
+                            mesMenorVenta = 0;
+                            MayorVenta = 0;
+                            MenorVenta = 0;
+                            band = true;
+                            band2 = true;
+                        
+                    }
                 }
-                Console.WriteLine("Total anual: " + TotalVentasAno);
-                Console.WriteLine("Mes mayor venta: " + mesMayorVenta);
-                Console.WriteLine("Mes menor venta: " + mesMenorVenta);
+                
 
                 file.Close();
                 Console.WriteLine($"File has {counter} lines.");
