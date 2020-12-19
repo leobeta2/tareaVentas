@@ -12,7 +12,7 @@ namespace TestConsoleTrabajo
         static void Main(string[] args)
         {
             Cliente cliente = new Cliente();
-            var datosPersonales = DatosPersonalesCliente(cliente);
+            DatosPersonalesCliente(cliente);
 
             DatosVentasCliente();
 
