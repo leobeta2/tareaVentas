@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using TestConsoleTrabajo.Models;
+using System.Linq;
 
 namespace TestConsoleTrabajo
 {
@@ -11,13 +12,13 @@ namespace TestConsoleTrabajo
         static void Main(string[] args)
         {
             Cliente cliente = new Cliente();
-            //var datosPersonales = DatosPersonalesCliente(cliente);
+            var datosPersonales = DatosPersonalesCliente(cliente);
 
             DatosVentasCliente();
 
         }
 
-        public static Cliente DatosPersonalesCliente(Cliente cliente) {
+        public static void DatosPersonalesCliente(Cliente cliente) {
             
             string telefono;
             ArrayList tel = new ArrayList();
@@ -59,7 +60,7 @@ namespace TestConsoleTrabajo
                 outputFile.WriteLine(cliente.antiguedad);
                 outputFile.WriteLine(cliente.categoriaCliente);
             }
-
+            Console.Clear();
             using (StreamReader file = new StreamReader(Path.Combine(docPath, "DatosCliente.txt")))
             {
                 string ln;
@@ -72,8 +73,6 @@ namespace TestConsoleTrabajo
                 file.Close();
 
             }
-
-            return cliente;
         }
 
         public static void DatosVentasCliente()
@@ -110,10 +109,12 @@ namespace TestConsoleTrabajo
                 mesVenta.Clear();
                 }
             }
-
+            Console.Clear();
             using (StreamReader file = new StreamReader(Path.Combine(docPath, "VentasCliente.txt")))
             {
-                int counter = 0;
+                using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "CalculosVentasAnualesTotales.txt")))
+                {
+                    int counter = 0;
                 string ln;
                 int TotalVentasAno = 0;
                 int mesMayorVenta = 0;
@@ -123,6 +124,7 @@ namespace TestConsoleTrabajo
                 bool band = true;
                 bool band2 = true;
                 String a="";
+                decimal[] xs = new decimal[12]; 
                 while ((ln = file.ReadLine()) != null)
                 {
                     if (band2) {
@@ -131,12 +133,15 @@ namespace TestConsoleTrabajo
                         Console.WriteLine("Año: " + a);
                         continue;
                     }
-                    Console.WriteLine(ln);
-                    counter++;
+                    xs[counter] = Convert.ToInt32(ln);
+                    
+                   
                     TotalVentasAno = TotalVentasAno + Convert.ToInt32(ln);
                     if (band) {
                         MayorVenta = Convert.ToInt32(ln);
+                        mesMayorVenta = 1;
                         MenorVenta = Convert.ToInt32(ln);
+                        mesMenorVenta = 1;
                         band = false;
                     }
                     
@@ -150,28 +155,64 @@ namespace TestConsoleTrabajo
                         MenorVenta = Convert.ToInt32(ln);
                         mesMenorVenta = counter + 1;
                     }
+                    counter++;
                     if (counter >= 12) {
-                        Console.WriteLine($"\nTotal anual año {a}: " + TotalVentasAno);
-                        Console.WriteLine("Mes mayor venta: " + mesMayorVenta);
-                        Console.WriteLine("Mes menor venta: " + mesMenorVenta);
-                        counter = 0;
-                            TotalVentasAno = 0;
-                            mesMayorVenta = 0;
-                            mesMenorVenta = 0;
-                            MayorVenta = 0;
-                            MenorVenta = 0;
-                            band = true;
-                            band2 = true;
+                        float prom = TotalVentasAno / 12;
+                        decimal mediana = Median(xs);
                         
+
+                                    outputFile.WriteLine(TotalVentasAno);
+                                    outputFile.WriteLine(mesMayorVenta);
+                                    outputFile.WriteLine(mesMenorVenta);
+                                    outputFile.WriteLine(prom);
+                                    outputFile.WriteLine(mediana);
+
+
+                        
+                        counter = 0;
+                        TotalVentasAno = 0;
+                        mesMayorVenta = 0;
+                        mesMenorVenta = 0;
+                        MayorVenta = 0;
+                        MenorVenta = 0;
+                        band = true;
+                        band2 = true;
+                        }
                     }
                 }
-                
-
-                file.Close();
-                Console.WriteLine($"File has {counter} lines.");
-
 
             }
+            using (StreamReader file = new StreamReader(Path.Combine(docPath, "CalculosVentasAnualesTotales.txt")))
+            {
+                string ln2;
+                string[] texto = new string[] { "\nTotal ventas del año", "Mes mayor venta", "Mes menor Venta", "Promedio Ventas", "Mediana Ventas" };
+                int cont = 0;
+                ArrayList calculosVentas = new ArrayList();
+                Console.WriteLine("Leyendo desde archivo: CalculosVentasAnualesTotales.txt\n");
+                while ((ln2 = file.ReadLine()) != null)
+                {
+                    calculosVentas.Add(ln2);
+                    
+                }
+                foreach (var item in calculosVentas) {
+                    Console.WriteLine($"{texto[cont]} : {item}");
+                    if (cont >= 4)
+                    {
+                        cont = 0;
+                    }
+                    else {
+                        cont++;
+                    }
+                }
+
+            }
+        }
+
+        public static decimal Median(decimal[] xs)
+        {
+            var ys = xs.OrderBy(x => x).ToList();
+            double mid = (ys.Count - 1) / 2.0;
+            return (ys[(int)(mid)] + ys[(int)(mid + 0.5)]) / 2;
         }
     }
 }
